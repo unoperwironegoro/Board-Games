@@ -20,7 +20,8 @@ public class BotRandellPR extends BotPR {
 	
 	@Override
 	public MovePR getBestMove(GamePR g, Colour c) {
-		ArrayList<MovePR> moves = UtilsPR.getAllValidMoves(UtilsPR.getAllPawns(board, c), board, c);
+		ArrayList<MovePR> moves = UtilsPR.getAllValidMoves(
+				UtilsPR.getAllPawns(board, c), board, c, g.getLastMove());
 		return moves.get(rand.nextInt(moves.size()));
 	}
 }

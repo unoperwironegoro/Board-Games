@@ -35,7 +35,7 @@ public class BoardTree {
 			this.isFinished = true;
 			return;
 		}
-		for(MovePR m : UtilsPR.getAllValidMoves(b, c)) {
+		for(MovePR m : UtilsPR.getAllValidMoves(b, c, lastMove)) {
 			BoardPR nextBoard = new BoardPR(b);
 			nextBoard.applyMove(m);
 			BoardTree nextBoardTree = new BoardTree(nextBoard, c.opposite(), explorations - 1, m);
@@ -64,7 +64,7 @@ public class BoardTree {
 			} else if(gameResult == movingPlayer.opposite()) {
 				return Integer.MIN_VALUE;
 			} else {
-				return UtilsAI.evaluateBoard(b, lastMove, c, movingPlayer, h) 
+				return UtilsAI.evaluateBoard(b, lastMove, c, movingPlayer, h)
 						- UtilsAI.evaluateBoard(b, lastMove, c, movingPlayer.opposite(), h);
 			}
 		} else {

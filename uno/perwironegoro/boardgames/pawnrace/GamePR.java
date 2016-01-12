@@ -21,7 +21,7 @@ public class GamePR {
 	}
 
 	public MovePR getLastMove() {
-		if(moves.size() == 0) {
+		if(moveIndex == 0) {
 			return null;
 		}
 		return moves.get(moveIndex - 1);

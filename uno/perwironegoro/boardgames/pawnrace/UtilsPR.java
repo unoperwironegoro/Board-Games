@@ -289,13 +289,32 @@ public class UtilsPR {
 		return pawnSquares;
 	}
 
-	public static ArrayList<MovePR> getAllValidMoves(BoardPR b, Colour c) {
-		return getAllValidMoves(getAllPawns(b, c), b, c);
+	/*
+	 * Used by the AI to determine a valid move
+	 */
+	public static ArrayList<MovePR> getAllValidMoves(BoardPR b, Colour c, MovePR lastMove) {
+		return getAllValidMoves(getAllPawns(b, c), b, c, lastMove);
 	}
 
 	public static ArrayList<MovePR> getAllValidMoves(ArrayList<Square> pawnSquares, 
-			BoardPR b, Colour c) {
+			BoardPR b, Colour c, MovePR lastMove) {
 		ArrayList<MovePR> validMoves = new ArrayList<MovePR>();
+
+		if(lastMove != null && lastMove.isDoubleMove()) {
+			Square sB = getBoardSquareBefore(lastMove.getTo(), b, c);
+			Square to = new Square(sB.getX(), sB.getY(), c);
+
+			if(to.getX() > 1 
+					&& b.getBoardSquareRelative(to, -1, 0).isOccupiedBy(c)) {
+				Square from = new Square(to.getX() - 1, to.getY(), Colour.NONE);
+				validMoves.add(new MovePR(from, to, MoveType.ENPASSANT));
+			}
+			if(to.getX() < b.getWidth() 
+					&& b.getBoardSquareRelative(to, 1, 0).isOccupiedBy(c)) {
+				Square from = new Square(to.getX() + 1, to.getY(), Colour.NONE);
+				validMoves.add(new MovePR(from, to, MoveType.ENPASSANT));
+			}
+		}
 
 		for(Square pawnSquare : pawnSquares) {
 			int moveDir = UtilsPR.moveDirection(c);

@@ -11,8 +11,8 @@ public class Heuristic {
 	protectScore;
 
 	/**
-	 * Multipliers: passed . | pastEdge .'' | onEdge :' | betweenEdge '.'
-	 * pawn exists
+	 * Multipliers: passed . , pastEdge .'' , onEdge :' , betweenEdge '.',
+	 * pawn exists, protecting score
 	 */
 	public Heuristic(int passed, int pastEdge, int onEdge, int betweenEdge, int pawnExists, int protectScore) {
 		this.passed = passed;
