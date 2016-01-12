@@ -15,4 +15,8 @@ public abstract class Move {
 	public Square getFrom() {
 		return from;
 	}
+	
+	public boolean sameAs(Move m) {
+		return to.sameAs(m.to) && from.sameAs(m.from);
+	}
 }

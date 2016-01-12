@@ -42,4 +42,8 @@ public class Square {
 	public boolean sameCoordsAs(Square s) {
 		return x == s.getX() && y == s.getY();
 	}
+	
+	public boolean sameAs(Square s) {
+		return x == s.x && y == s.y && occupier == s.occupier;
+	}
 }
