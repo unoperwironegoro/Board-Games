@@ -15,7 +15,7 @@ public class UtilsPR {
 	public static Square getBoardSquareBefore(Square to, Board b, Colour c) {
 		return b.getBoardSquareRelative(to, 0, -moveDirection(c));
 	}
-	
+
 	public static Square getBoardSquareBefore(Square to, Board b) {
 		Colour c = to.getOccupier();
 		return getBoardSquareBefore(to, b, c);
@@ -86,10 +86,12 @@ public class UtilsPR {
 	}
 
 	protected static Square SANtoSquare(String san, Colour occupier) {
-		assert(san.length() == 2): "The SAN must be in the form @#";
-		int x = UtilsBoard.alphaCharToIndex(san.charAt(0));
-		int y = UtilsBoard.numCharToIndex(san.charAt(1));
-		return new Square(x, y, occupier);
+		if(san.length() == 2) {
+			int x = UtilsBoard.alphaCharToIndex(san.charAt(0));
+			int y = UtilsBoard.numCharToIndex(san.charAt(1));
+			return new Square(x, y, occupier);
+		}
+		return null;
 	}
 
 	public static boolean moveIsValid(MovePR m, Board b, MovePR lm) {

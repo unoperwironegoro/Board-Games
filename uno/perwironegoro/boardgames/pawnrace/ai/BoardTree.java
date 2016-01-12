@@ -64,8 +64,8 @@ public class BoardTree {
 			} else if(gameResult == movingPlayer.opposite()) {
 				return Integer.MIN_VALUE;
 			} else {
-				return UtilsAI.evaluateBoard(b, c, movingPlayer, h) 
-						- UtilsAI.evaluateBoard(b, c, movingPlayer.opposite(), h);
+				return UtilsAI.evaluateBoard(b, lastMove, c, movingPlayer, h) 
+						- UtilsAI.evaluateBoard(b, lastMove, c, movingPlayer.opposite(), h);
 			}
 		} else {
 			int minMaxScore = c == movingPlayer? 

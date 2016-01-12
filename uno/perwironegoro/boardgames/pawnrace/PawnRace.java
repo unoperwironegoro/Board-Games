@@ -3,6 +3,7 @@ package uno.perwironegoro.boardgames.pawnrace;
 import java.util.Scanner;
 
 import uno.perwironegoro.boardgames.Colour;
+import uno.perwironegoro.boardgames.Square;
 import uno.perwironegoro.boardgames.pawnrace.ai.BotMaxPR;
 import uno.perwironegoro.boardgames.pawnrace.ai.BotPR;
 import uno.perwironegoro.boardgames.pawnrace.ai.UtilsAI;
@@ -80,9 +81,22 @@ public class PawnRace {
 							continue turnloop;
 						} else if(input.toLowerCase().equals("evaluate")) {
 							System.out.println("W: "
-									+ UtilsAI.evaluateBoard(board, currentPlayer.getColour(), Colour.WHITE, BotMaxPR.H)
+									+ UtilsAI.evaluateBoard(board, game.getLastMove(), currentPlayer.getColour(), Colour.WHITE, BotMaxPR.H)
 									+ ", B: "
-									+ UtilsAI.evaluateBoard(board, currentPlayer.getColour(), Colour.BLACK, BotMaxPR.H));
+									+ UtilsAI.evaluateBoard(board, game.getLastMove(), currentPlayer.getColour(), Colour.BLACK, BotMaxPR.H));
+							continue turnloop;
+						} else if(input.toLowerCase().equals("evaluatepawn")) {
+							String sq = sc.next();
+							Square evalSquare = UtilsPR.SANtoSquare(sq, Colour.NONE);
+							
+							if(evalSquare != null) {
+								Colour c = board.getBoardSquare(evalSquare).getOccupier();
+								if(c != Colour.NONE) {
+									System.out.println(sq + ": "
+											+ UtilsAI.evaluatePawn(evalSquare, board, game.getLastMove(), 
+													currentPlayer.getColour(), c, BotMaxPR.H, true));
+								}
+							}
 							continue turnloop;
 						} else {
 							m = UtilsPR.SANtoValidMove(input, board, 
