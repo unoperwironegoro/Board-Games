@@ -98,6 +98,11 @@ public class PawnRace {
 								}
 							}
 							continue turnloop;
+						} else if(input.toLowerCase().equals("validmoves")) {
+							for(MovePR vm : UtilsPR.getAllValidMoves(board, currentPlayer.getColour(), game.getLastMove())) {
+								System.out.println(vm.getSAN());
+							}
+							continue turnloop;
 						} else {
 							m = UtilsPR.SANtoValidMove(input, board, 
 									game.getLastMove(), currentPlayer.getColour());
