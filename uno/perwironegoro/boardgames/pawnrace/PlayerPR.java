@@ -20,6 +20,10 @@ public class PlayerPR {
 	public boolean isComputer() {
 		return botBrain != null;
 	}
+	
+	public BotPR getBotBrain() {
+		return botBrain;
+	}
 
 	public Colour getColour() {
 		return colour;
@@ -32,7 +36,7 @@ public class PlayerPR {
 		double timeTaken = (nowTime - lastTime) / 1E9d;
 		System.out.println(bestMove.getSAN() + " (" 
 		+ timeTaken + "s)");
-		System.out.println("");
+		System.out.println();
 		game.applyMove(bestMove);
 	}
 }
