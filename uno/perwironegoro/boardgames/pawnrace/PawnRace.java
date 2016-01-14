@@ -10,13 +10,11 @@ import uno.perwironegoro.boardgames.pawnrace.ai.Heuristic;
 import uno.perwironegoro.boardgames.pawnrace.ai.UtilsAI;
 
 public class PawnRace {
-	private static final Heuristic defaultAI = Heuristic.Max;
+	private static final Heuristic defaultAI = Heuristic.getHeuristic("Max");
 
 	private static PlayerPR player1;
 	private static PlayerPR player2;
 	private static PlayerPR currentPlayer;
-	private static BotPR botBrain1 = null;
-	private static BotPR botBrain2 = null;
 	private static Heuristic h1 = defaultAI;
 	private static Heuristic h2 = defaultAI;
 	private static BoardPR board;
@@ -38,7 +36,13 @@ public class PawnRace {
 								+ currentPlayer.getColour().toString() + "'s turn");
 
 						if(currentPlayer.isComputer()) {
-							currentPlayer.makeMove();
+							long lastTime = System.nanoTime();
+							MovePR m = currentPlayer.chooseMove();
+							long nowTime = System.nanoTime();
+							double timeTaken = (nowTime - lastTime) / 1E9d;
+							System.out.println(m.getSAN() + " (" + timeTaken + "s)");
+							System.out.println();
+							game.applyMove(m);
 						}
 						else {
 							//TODO extract out command/input logic
@@ -63,9 +67,9 @@ public class PawnRace {
 									System.out.println("W: "
 											+ UtilsAI.evaluateBoard(board, game.getLastMove(), 
 													currentPlayer.getColour(), Colour.WHITE, h1)
-													+ ", B: "
-													+ UtilsAI.evaluateBoard(board, game.getLastMove(), 
-															currentPlayer.getColour(), Colour.BLACK, h2));
+											+ ", B: "
+											+ UtilsAI.evaluateBoard(board, game.getLastMove(), 
+													currentPlayer.getColour(), Colour.BLACK, h2));
 									continue turnloop;
 								} else if(input.toLowerCase().equals("evaluatepawn")) {
 									String sq = sc.next();
@@ -74,7 +78,7 @@ public class PawnRace {
 									if(evalSquare != null) {
 										Colour c = board.getBoardSquare(evalSquare).getOccupier();
 										if(c != Colour.NONE) {
-											for(Heuristic h : Heuristic.getAllHeuristics())
+											for(Heuristic h : Heuristic.hs)
 												System.out.println(h.getName() + ":: " + sq + ": "
 														+ UtilsAI.evaluatePawn(evalSquare, board, game.getLastMove(), 
 																currentPlayer.getColour(), c, h, true));
@@ -131,7 +135,7 @@ public class PawnRace {
 				System.out.println("What are the new arguments?");
 
 				args = new String[]{sc.next(), sc.next(), sc.next(), 
-				        sc.next(), sc.next(), sc.next()};
+						sc.next(), sc.next(), sc.next()};
 				setUpFromArgs(args); //TODO Make this bulletproof
 			}
 		sc.close();
@@ -174,9 +178,15 @@ public class PawnRace {
 	}
 
 	public static void setUpPlayers(boolean p1isCPU, boolean p2isCPU, Heuristic h1st, Heuristic h2nd) {		
+		BotPR botBrain1 = null;
+		BotPR botBrain2 = null;
+
+		h1 = h1st;
+		h2 = h2nd;
+
 		if(p1isCPU) {
-			if(h1st == null) {
-				h1st = defaultAI;
+			if(h1 == null) {
+				h1 = defaultAI;
 				System.out.println("Bot not found. " + defaultAI.getName() + " is playing as White");
 			} else {
 				System.out.println(h1.getName() + " is playing as White");
@@ -185,8 +195,8 @@ public class PawnRace {
 		}
 
 		if(p2isCPU) {
-			if(h2nd == null) {
-				h2nd = defaultAI;
+			if(h2 == null) {
+				h2 = defaultAI;
 				System.out.println("Bot not found. " + defaultAI.getName() + " is playing as Black");
 			} else {
 				System.out.println(h2.getName() + " is playing as Black");
