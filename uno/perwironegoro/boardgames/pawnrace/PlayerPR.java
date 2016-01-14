@@ -29,14 +29,7 @@ public class PlayerPR {
 		return colour;
 	}
 
-	public void makeMove() {
-		long lastTime = System.nanoTime();
-		MovePR bestMove = botBrain.getBestMove(game, colour);
-		long nowTime = System.nanoTime();
-		double timeTaken = (nowTime - lastTime) / 1E9d;
-		System.out.println(bestMove.getSAN() + " (" 
-		+ timeTaken + "s)");
-		System.out.println();
-		game.applyMove(bestMove);
+	public MovePR chooseMove() {
+		return botBrain.getBestMove(game, colour);
 	}
 }
