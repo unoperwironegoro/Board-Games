@@ -2,10 +2,12 @@ package uno.perwironegoro.boardgames.pawnrace.ai;
 
 public class Heuristic {
 
-	public static final Heuristic
-	Max = new Heuristic(10, 4, 3, 2, 10, 0, "Max"),
-	Edgar = new Heuristic(10, 4, 3, 2, 10, 0, "Edgar");
-	
+	public static final Heuristic[] hs ={ 
+			new Heuristic(10, 4, 3, 2, 10, 0, "Max"),
+			new Heuristic(10, 6, 5, 2, 10, 0, "Edgar"),
+			new Heuristic(5, 4, 3, 2, 10, 0, "John"),
+			new Heuristic(10, 6, 5, 5, 15, 5, "Tortimer")};
+
 	protected final int
 	betweenEdge,
 	pastEdge,
@@ -13,7 +15,7 @@ public class Heuristic {
 	passed,
 	pawnExists,
 	protectScore;
-	
+
 	protected final String name;
 
 	/**
@@ -25,30 +27,23 @@ public class Heuristic {
 		this.pastEdge = pastEdge;
 		this.onEdge = onEdge;
 		this.betweenEdge = betweenEdge;
-		
+
 		this.pawnExists = pawnExists;
 		this.protectScore = protectScore;
-		
+
 		this.name = name;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public static Heuristic getHeuristic(String name) {
-		for(Heuristic h : Heuristic.getAllHeuristics()) {
+		for(Heuristic h : hs) {
 			if(name.equals(h.getName().toLowerCase())) {
 				return h;
 			}
 		}
 		return null;
-	}
-	
-	public static Heuristic[] getAllHeuristics() {
-		Heuristic[] hs = new Heuristic[2];
-		hs[0] = Max;
-		hs[1] = Edgar;
-		return hs;
 	}
 }
