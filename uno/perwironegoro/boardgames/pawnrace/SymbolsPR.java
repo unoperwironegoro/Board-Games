@@ -8,6 +8,7 @@ public class SymbolsPR {
 	BLACK = "B",
 	WHITE = "W",
 	NONE = ".",
+	STALEMATE = "S",
 	
 	CAPTURESYMBOL = "x",
 	MOVESYMBOL = "-";
@@ -17,6 +18,14 @@ public class SymbolsPR {
 		case BLACK: return BLACK;
 		case WHITE: return WHITE;
 		default: return NONE;
+		}
+	}
+	
+	public static String winSymbolOf(Colour c){
+		switch(c) {
+		case BLACK: return BLACK;
+		case WHITE: return WHITE;
+		default: return STALEMATE;
 		}
 	}
 	
