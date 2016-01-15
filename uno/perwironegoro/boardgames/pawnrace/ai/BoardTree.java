@@ -35,11 +35,17 @@ public class BoardTree {
 			this.isFinished = true;
 			return;
 		}
-		for(MovePR m : UtilsPR.getAllValidMoves(b, c, lastMove)) {
-			BoardPR nextBoard = new BoardPR(b);
-			nextBoard.applyMove(m);
-			BoardTree nextBoardTree = new BoardTree(nextBoard, c.opposite(), explorations - 1, m);
-			nextBoards.add(nextBoardTree);
+		if(nextBoards.isEmpty()) {
+			for(MovePR m : UtilsPR.getAllValidMoves(b, c, lastMove)) {
+				BoardPR nextBoard = new BoardPR(b);
+				nextBoard.applyMove(m);
+				BoardTree nextBoardTree = new BoardTree(nextBoard, c.opposite(), explorations - 1, m);
+				nextBoards.add(nextBoardTree);
+			}
+		} else {
+			for(BoardTree bt : nextBoards) {
+				bt.exploreBoardTree(explorations - 1, bt.lastMove);
+			}
 		}
 	}
 
@@ -81,8 +87,12 @@ public class BoardTree {
 		}
 	}
 
-	//unused
-	//	public BoardTree pickBranch(MovePR m) {
-	//		return nextBoards.get(m.getSAN());
-	//	}
+	public BoardTree pickBranch(MovePR m) {
+		for(BoardTree bt : nextBoards) {
+			if(bt.lastMove.equals(m)) {
+				return bt;
+			}
+		}
+		return null;
+	}
 }
