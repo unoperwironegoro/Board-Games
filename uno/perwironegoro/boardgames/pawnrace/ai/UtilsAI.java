@@ -46,6 +46,7 @@ public class UtilsAI {
 		boolean enemyOnFile = false;
 		boolean enemyOnFileL = false;
 		boolean enemyOnFileR = false;
+		boolean isPassed = false;
 
 		int yBound = c == Colour.WHITE? b.getHeight() - pawnSquare.getY() 
 				: pawnSquare.getY() - 1;
@@ -71,6 +72,7 @@ public class UtilsAI {
 		//Passed
 		if(!enemyOnFileL && !enemyOnFile && !enemyOnFileR) {
 			moveScore *= h.passed;
+			isPassed = true;
 
 			int mostEnemyAdvanced = 0;
 			for(Square enemyPawnSquare : UtilsPR.getAllPawns(b, c.opposite())) {
@@ -127,7 +129,7 @@ public class UtilsAI {
 			if(b.getBoardSquareRelative(pawnSquare, -1, moveDir).isOccupiedBy(c.opposite())) {
 				isThreatened = true;
 			} else if(b.getBoardSquareRelative(pawnSquare, -1, moveDir).isOccupiedBy(c)) {
-				protectScore += 5;
+				protectScore += h.protectScore;
 			}
 			if(b.getBoardSquareRelative(pawnSquare, -1, -moveDir).isOccupiedBy(c)) {
 				isProtected = true;
@@ -155,7 +157,10 @@ public class UtilsAI {
 		}
 
 		int pawnScore = h.pawnExists;
-
+		if(isPassed) {
+			pawnScore *= h.passed;
+		}
+		
 		pawnScore += moveScore + protectScore;
 
 		if(((isThreatened && !isProtected) || (isEPThreatened && !isEPProtected)) 
