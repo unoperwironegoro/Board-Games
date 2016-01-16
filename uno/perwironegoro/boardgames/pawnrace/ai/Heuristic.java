@@ -4,9 +4,13 @@ public class Heuristic {
 
 	public static final Heuristic[] hs ={ 
 			new Heuristic(10, 4, 3, 2, 10, 0, "Max"),
-			new Heuristic(10, 6, 5, 2, 10, 0, "Edgar"),
+			new Heuristic(10, 6, 5, 2, 10, 0, "Ed"),
 			new Heuristic(5, 4, 3, 2, 10, 0, "John"),
-			new Heuristic(10, 6, 5, 5, 15, 5, "Tortimer")};
+			new Heuristic(5, 2, 3, 4, 10, 0, "Jennie"),
+			new Heuristic(10, 6, 5, 5, 15, 5, "Terry"),
+			new Heuristic(10, 6, 5, 5, 15, 15, "Dave"),
+			new Heuristic(10, 3, 5, 5, 15, 15, "Ellie"),
+			new Heuristic(1, 1, 1, 1, 5, 0, "Hayley")};
 
 	protected final int
 	betweenEdge,
@@ -40,7 +44,7 @@ public class Heuristic {
 
 	public static Heuristic getHeuristic(String name) {
 		for(Heuristic h : hs) {
-			if(name.equals(h.getName().toLowerCase())) {
+			if(name.toLowerCase().equals(h.getName().toLowerCase())) {
 				return h;
 			}
 		}
