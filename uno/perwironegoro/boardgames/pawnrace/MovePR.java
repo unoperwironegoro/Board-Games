@@ -37,22 +37,18 @@ public class MovePR extends Move {
 	public String getSAN() {
 		switch(moveType) {
 		case SINGLEMOVE:
-			return squareToSAN(to);
+			return UtilsPR.squareToSAN(to);
 		case DOUBLEMOVE:
-			return squareToSAN(to);
+			return UtilsPR.squareToSAN(to);
 		case CAPTURE:
 		case ENPASSANT:
 			return String.valueOf(UtilsBoard.indexToStringLower(from.getX()))
 					+ SymbolsPR.symbolOf(moveType)
-					+ squareToSAN(to);
+					+ UtilsPR.squareToSAN(to);
 		}
-		return squareToSAN(from)
+		return UtilsPR.squareToSAN(from)
 				+ SymbolsPR.symbolOf(moveType)
-				+ squareToSAN(to);
-	}
-	
-	public static String squareToSAN(Square s) {
-		return String.valueOf(UtilsBoard.indexToStringLower(s.getX())) + s.getY();
+				+ UtilsPR.squareToSAN(to);
 	}
 	
 	public Colour getPlayer() {
