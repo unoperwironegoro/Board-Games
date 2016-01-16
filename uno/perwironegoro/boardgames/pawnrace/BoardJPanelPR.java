@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import uno.perwironegoro.boardgames.Colour;
-import uno.perwironegoro.boardgames.Square;
 
 public class BoardJPanelPR extends JPanel implements MouseListener {
 	private static final long serialVersionUID = 1L;
