@@ -39,6 +39,7 @@ public class PawnRace {
 	private int delay;
 
 	private BoardJPanelPR gui;
+	private boolean isFakeOnline;
 	private JTextField jtfMove, jtfInfo;
 
 	public static final String WINDOWTITLE = "Pawn Race :: Harjuno Perwironegoro";
@@ -51,46 +52,48 @@ public class PawnRace {
 	static Image WSQUARE, SSQUARE, BSQUARE, WPAWN, BPAWN;
 	private static Image ICON;
 
-
 	public static void main(String[] args) {
-		PawnRace pr = new PawnRace();
-		pr.rand = new Random();
+		new PawnRace(args);
+	}
+
+	public PawnRace(String[] args) {
+		rand = new Random();
 		if (args.length > 0 && args[0].equals("gui")) {
 			if (args.length > 1) {
 				try {
-					pr.delay = Integer.parseInt(args[1]);
+					delay = Integer.parseInt(args[1]);
 				} catch (NumberFormatException e) {
-					pr.delay = 2000;
+					delay = 2000;
 				}
 			}
-			pr.loadImages();
-			pr.createGUI();
-			pr.setUpFromJOPs();
+			loadImages();
+			createGUI();
+			setUpFromJOPs();
 		} else {
-			pr.sc = new Scanner(System.in);
-			pr.setUpFromArgs(args);
+			sc = new Scanner(System.in);
+			setUpFromArgs(args);
 		}
 
 		for (;;) {
-			switch (pr.playGame()) {
+			switch (playGame()) {
 			case WHITE:
-				System.out.println("White wins!");
+				printInfo("White wins!");
 				break;
 			case BLACK:
-				System.out.println("Black wins!");
+				printInfo("Black wins!");
 				break;
 			default:
-				System.out.println("It's a Stalemate!");
+				printInfo("It's a Stalemate!");
 				break;
 			}
 
-			if (pr.gui == null) {
+			if (gui == null) {
 				System.out.println();
 				System.out.println("Do you want to play again? <y/n>");
 
-				if (!pr.sc.next().toLowerCase().equals("y")) {
+				if (!sc.next().toLowerCase().equals("y")) {
 					System.out.println("Thanks for playing Pawn Race!");
-					pr.sc.close();
+					sc.close();
 					return;
 				}
 
@@ -98,12 +101,19 @@ public class PawnRace {
 
 				boolean validArgs = false;
 				while (!validArgs) {
-					args = new String[] { pr.sc.next(), pr.sc.next(), pr.sc.next(), pr.sc.next(), pr.sc.next(),
-							pr.sc.next() };
-					validArgs = pr.setUpFromArgs(args);
+					args = new String[] { sc.next(), sc.next(), sc.next(), sc.next(), sc.next(), sc.next() };
+					validArgs = setUpFromArgs(args);
 				}
 			} else {
-				pr.setUpFromJOPs();
+				String oppname = isFakeOnline? (h1 == defaultAI ? h2.getName() : h1.getName()) : "a friend";
+				String[] options = { "Find another game", "Quit" };
+				int p = JOptionPane.showOptionDialog(null, "You played against " + oppname, "Thanks for playing!",
+						JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, new ImageIcon(ICON), options, options[0]);
+				if (p == 0) {
+					setUpFromJOPs();
+				} else {
+					return;
+				}
 			}
 		}
 	}
@@ -126,13 +136,32 @@ public class PawnRace {
 		String sqW = null;
 		String sqB = null;
 
-		// Supports player vs bot only
-		Object[] playerOptions = { "White", "Black (picks gaps)" };
-		int p = JOptionPane.showOptionDialog(null, "Will you play as White or Black?", "Finding Game :: Player Setup",
-				JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, new ImageIcon(ICON), playerOptions,
-				playerOptions[0]);
+		boolean wComp, bComp;
 
-		if (p == 1) {
+		Object[] gameOptions = { "Online", "Hotseat" };
+		int t = JOptionPane.showOptionDialog(null,
+				"How to play:" + "\n\t- Win by getting a pawn to the end" + "\n\t- All chess rules apply"
+						+ "\n\t- Black chooses an empty file " + "\n\t  for each row",
+				"Welcome to Pawn Race", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, new ImageIcon(ICON),
+				gameOptions, gameOptions[0]);
+
+		if (t == 1) {
+			wComp = bComp = false;
+		} else if (t == 0) {
+			// Supports player vs bot only
+			isFakeOnline = true;
+			Object[] playerOptions = { "White", "Black (picks gaps)" };
+			int u = JOptionPane.showOptionDialog(null, "Will you play as White or Black?",
+					"Finding Game :: Player Setup", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+					new ImageIcon(ICON), playerOptions, playerOptions[0]);
+			wComp = u == 1;
+			bComp = u == 0;
+		} else {
+			System.exit(0);
+			return; // To stop the squiggly red line
+		}
+
+		if (!bComp) {
 			JPanel splitjp1 = new JPanel();
 			splitjp1.setLayout(new BoxLayout(splitjp1, BoxLayout.Y_AXIS));
 
@@ -169,10 +198,11 @@ public class PawnRace {
 		}
 
 		setUpBoardGame(sqW.toLowerCase().charAt(0), sqB.toLowerCase().charAt(0));
-		setUpPlayers(p == 1, p != 1, Heuristic.hs[rand.nextInt(Heuristic.hs.length)],
+		gui.setBoard(board);
+
+		setUpPlayers(wComp, bComp, Heuristic.hs[rand.nextInt(Heuristic.hs.length)],
 				Heuristic.hs[rand.nextInt(Heuristic.hs.length)]);
 
-		gui.setBoard(board);
 	}
 
 	private void printInfo(String s) {
@@ -288,8 +318,8 @@ public class PawnRace {
 							if (c != Colour.NONE) {
 								for (Heuristic h : Heuristic.hs)
 									System.out
-									.println(h.getName() + ":: " + sq + ": " + UtilsAI.evaluatePawn(evalSquare,
-											board, game.getLastMove(), currentPlayer.getColour(), c, h, true));
+											.println(h.getName() + ":: " + sq + ": " + UtilsAI.evaluatePawn(evalSquare,
+													board, game.getLastMove(), currentPlayer.getColour(), c, h, true));
 							}
 						}
 						continue;
