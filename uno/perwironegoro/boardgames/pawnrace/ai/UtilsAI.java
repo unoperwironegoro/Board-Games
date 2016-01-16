@@ -119,7 +119,7 @@ public class UtilsAI {
 		if(pawnSquare.getX() > 1) {
 			if(lastMove != null && lastMove.isDoubleMove() && lastMove.getTo().sameCoordsAs(pawnSquare)
 					&& b.getBoardSquareRelative(pawnSquare, -1, 0).isOccupiedBy(c.opposite())) {
-				isEPThreatened = true;
+				isEPThreatened = true; //TODO check if this works
 				//Protection lasts for one move only.
 				if(b.getBoardSquareRelative(pawnSquare, -1, -2*moveDir).isOccupiedBy(c)) {
 					isEPProtected = true;
