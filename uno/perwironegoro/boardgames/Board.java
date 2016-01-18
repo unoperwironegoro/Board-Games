@@ -1,7 +1,5 @@
 package uno.perwironegoro.boardgames;
 
-import uno.perwironegoro.boardgames.pawnrace.SymbolsPR;
-
 public abstract class Board {
 	//The squares are pivoted from (1,1)!
 	protected Square[][] squares;
@@ -42,7 +40,7 @@ public abstract class Board {
 		getBoardSquare(s).setOccupier(s.getOccupier());
 	}
 	
-	public void display() {
+	public void display(Symbols sym) {
 		int marginSize = UtilsDisplay.digits(getHeight()) + 1;
 		
 		String alphaIndex = UtilsDisplay.fitInMargin(marginSize, "", ' ');
@@ -57,7 +55,7 @@ public abstract class Board {
 			System.out.print(UtilsDisplay.fitInMargin(marginSize, String.valueOf(y + 1), ' '));
 			
 			for(int x = 0; x < getWidth(); x++) {
-				System.out.print(SymbolsPR.symbolOf(squares[x][y].getOccupier()) + " ");
+				System.out.print(sym.symbolOf(squares[x][y].getOccupier()) + " ");
 			}
 			
 			System.out.println(y + 1);
