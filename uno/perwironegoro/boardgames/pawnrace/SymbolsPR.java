@@ -29,6 +29,14 @@ public class SymbolsPR {
 		}
 	}
 	
+	public static String winMessageOf(Colour c){
+		switch(c) {
+		case BLACK: return "Black wins!";
+		case WHITE: return "White wins!";
+		default: return "It's a stalemate!";
+		}
+	}
+	
 	public static boolean isCaptureSymbol(String s) {
 		return s.equals(CAPTURESYMBOL);
 	}
