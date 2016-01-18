@@ -13,8 +13,8 @@ public class TestAIPRs {
 
 	public static void main(String[] args) {
 		System.out.println("=====Running the AI tournament!=====");
-		String[] competitors = new String[Heuristic.hs.length]; //TODO display results in a table
-		String[] competitorsInitials = new String[Heuristic.hs.length];
+//		String[] competitors = new String[Heuristic.hs.length]; //TODO display results in a table
+//		String[] competitorsInitials = new String[Heuristic.hs.length];
 		
 		for(int i = 0; i < Heuristic.hs.length; i++) {
 			for(int j = i + 1; j < Heuristic.hs.length; j++) {	

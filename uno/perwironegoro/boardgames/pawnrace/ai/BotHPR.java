@@ -8,7 +8,7 @@ import uno.perwironegoro.boardgames.pawnrace.MovePR;
 //Minimax AI
 public class BotHPR extends BotPR{
 	public final Heuristic h;
-	private BoardTree bt;
+//	private BoardTree bt;
 	
 	public BotHPR(BoardPR b, Heuristic h) {
 		super(b);
@@ -24,7 +24,7 @@ public class BotHPR extends BotPR{
 	}
 
 	@Override
-	public MovePR getBestMove(GamePR g, Colour c) { //TODO cut branches
+	public MovePR getBestMove(GamePR g, Colour c) { //TODO cut branches, improve depth
 //		if(bt == null) {
 //			bt = new BoardTree(board, c, 4, null);
 //		} else {
