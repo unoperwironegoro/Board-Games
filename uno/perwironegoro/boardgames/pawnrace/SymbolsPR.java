@@ -1,9 +1,10 @@
 package uno.perwironegoro.boardgames.pawnrace;
 
 import uno.perwironegoro.boardgames.Colour;
+import uno.perwironegoro.boardgames.Symbols;
 import uno.perwironegoro.boardgames.pawnrace.MovePR.MoveType;
 
-public class SymbolsPR {
+public class SymbolsPR implements Symbols{
 	public static final String
 	BLACK = "B",
 	WHITE = "W",
@@ -13,7 +14,7 @@ public class SymbolsPR {
 	CAPTURESYMBOL = "x",
 	MOVESYMBOL = "-";
 	
-	public static String symbolOf(Colour c){
+	public String symbolOf(Colour c){
 		switch(c) {
 		case BLACK: return BLACK;
 		case WHITE: return WHITE;
