@@ -2,11 +2,13 @@ package uno.perwironegoro.boardgames.pawnrace;
 
 import uno.perwironegoro.boardgames.Board;
 import uno.perwironegoro.boardgames.Colour;
+import uno.perwironegoro.boardgames.Symbols;
 import uno.perwironegoro.boardgames.UtilsBoard;
 
 public class BoardPR extends Board {
 	public static final char ARBCHAR = '@';
-
+	private static final Symbols sym = new SymbolsPR();
+	
 	public BoardPR(BoardPR b) {
 		super(b.getWidth(), b.getHeight());
 		for (int x = 1; x <= b.getWidth(); x++) {
@@ -54,5 +56,9 @@ public class BoardPR extends Board {
 		} else if (move.isCapture()) {
 			getBoardSquare(move.getTo()).setOccupier(movedPlayer.opposite());
 		}
+	}
+	
+	public void display() {
+		super.display(sym);
 	}
 }
