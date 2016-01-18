@@ -26,6 +26,7 @@ import uno.perwironegoro.boardgames.pawnrace.ai.UtilsAI;
 
 public class PawnRace {
 	private static final Heuristic defaultAI = Heuristic.getHeuristic("Max");
+	private static final int defaultOnlineBotDelay = 2000;
 
 	private PlayerPR player1;
 	private PlayerPR player2;
@@ -36,6 +37,7 @@ public class PawnRace {
 	private BoardPR board;
 	private GamePR game;
 	private Random rand;
+	private int onlineBotDelay;
 	private int delay;
 
 	private BoardJPanelPR gui;
@@ -59,11 +61,12 @@ public class PawnRace {
 	public PawnRace(String[] args) {
 		rand = new Random();
 		if (args.length > 0 && args[0].equals("gui")) {
+			onlineBotDelay = defaultOnlineBotDelay;
 			if (args.length > 1) {
 				try {
-					delay = Integer.parseInt(args[1]);
+					onlineBotDelay = Integer.parseInt(args[1]);
 				} catch (NumberFormatException e) {
-					delay = 2000;
+					e.printStackTrace();
 				}
 			}
 			loadImages();
@@ -75,17 +78,9 @@ public class PawnRace {
 		}
 
 		for (;;) {
-			switch (playGame()) {
-			case WHITE:
-				printInfo("White wins!");
-				break;
-			case BLACK:
-				printInfo("Black wins!");
-				break;
-			default:
-				printInfo("It's a Stalemate!");
-				break;
-			}
+			Colour result = playGame();
+			String winMsg = SymbolsPR.winMessageOf(result);
+			printInfo(winMsg);
 
 			if (gui == null) {
 				System.out.println();
@@ -101,14 +96,19 @@ public class PawnRace {
 
 				boolean validArgs = false;
 				while (!validArgs) {
-					args = new String[] { sc.next(), sc.next(), sc.next(), sc.next(), sc.next(), sc.next() };
+					args = new String[] { sc.next(), sc.next(), sc.next(),
+							sc.next(), sc.next(), sc.next() };
 					validArgs = setUpFromArgs(args);
 				}
 			} else {
-				String oppname = isFakeOnline? (h1 == defaultAI ? h2.getName() : h1.getName()) : "a friend";
+				String playerDetails = isFakeOnline ? ("\nYou played against " + (h1 == defaultAI ? h2
+						.getName() : h1.getName()))
+						: "";
 				String[] options = { "Find another game", "Quit" };
-				int p = JOptionPane.showOptionDialog(null, "You played against " + oppname, "Thanks for playing!",
-						JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, new ImageIcon(ICON), options, options[0]);
+				int p = JOptionPane.showOptionDialog(null, winMsg
+						+ playerDetails, "Thanks for playing!",
+						JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+						new ImageIcon(ICON), options, options[0]);
 				if (p == 0) {
 					setUpFromJOPs();
 				} else {
@@ -121,12 +121,18 @@ public class PawnRace {
 	private void loadImages() {
 		String pathPrefix = "/uno/perwironegoro/boardgames/resources/";
 		try {
-			ICON = ImageIO.read(getClass().getResource(pathPrefix + ICONFILENAME));
-			WSQUARE = ImageIO.read(getClass().getResource(pathPrefix + WSQUAREFILENAME));
-			BSQUARE = ImageIO.read(getClass().getResource(pathPrefix + BSQUAREFILENAME));
-			SSQUARE = ImageIO.read(getClass().getResource(pathPrefix + SSQUAREFILENAME));
-			WPAWN = ImageIO.read(getClass().getResource(pathPrefix + WPAWNFILENAME));
-			BPAWN = ImageIO.read(getClass().getResource(pathPrefix + BPAWNFILENAME));
+			ICON = ImageIO.read(getClass().getResource(
+					pathPrefix + ICONFILENAME));
+			WSQUARE = ImageIO.read(getClass().getResource(
+					pathPrefix + WSQUAREFILENAME));
+			BSQUARE = ImageIO.read(getClass().getResource(
+					pathPrefix + BSQUAREFILENAME));
+			SSQUARE = ImageIO.read(getClass().getResource(
+					pathPrefix + SSQUAREFILENAME));
+			WPAWN = ImageIO.read(getClass().getResource(
+					pathPrefix + WPAWNFILENAME));
+			BPAWN = ImageIO.read(getClass().getResource(
+					pathPrefix + BPAWNFILENAME));
 		} catch (IOException e) {
 		}
 	}
@@ -138,24 +144,34 @@ public class PawnRace {
 
 		boolean wComp, bComp;
 
-		Object[] gameOptions = { "Online", "Hotseat" };
-		int t = JOptionPane.showOptionDialog(null,
-				"How to play:" + "\n\t- Win by getting a pawn to the end" + "\n\t- All chess rules apply"
-						+ "\n\t- Black chooses an empty file " + "\n\t  for each row",
-				"Welcome to Pawn Race", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE, new ImageIcon(ICON),
-				gameOptions, gameOptions[0]);
+		String botOption = "Vs Bot";
+		String hotseatOption = "Hotseat";
+		String onlineOption = "Online";
+		String[] gameOptions = { onlineOption, hotseatOption, botOption };
+		int t = JOptionPane.showOptionDialog(null, "How to play:"
+				+ "\n\t- Win by getting a pawn to the end"
+				+ "\n\t- All chess rules apply"
+				+ "\n\t- Black chooses an empty file " + "\n\t  for each row",
+				"Welcome to Pawn Race", JOptionPane.YES_NO_OPTION,
+				JOptionPane.PLAIN_MESSAGE, new ImageIcon(ICON), gameOptions,
+				gameOptions[0]);
 
-		if (t == 1) {
+		if (gameOptions[t].equals(hotseatOption)) {
 			wComp = bComp = false;
-		} else if (t == 0) {
+		} else if (gameOptions[t].equals(botOption)
+				|| gameOptions[t].equals(onlineOption)) {
 			// Supports player vs bot only
-			isFakeOnline = true;
+			isFakeOnline = gameOptions[t].equals(onlineOption);
 			Object[] playerOptions = { "White", "Black (picks gaps)" };
-			int u = JOptionPane.showOptionDialog(null, "Will you play as White or Black?",
-					"Finding Game :: Player Setup", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
+			int u = JOptionPane.showOptionDialog(null,
+					"Will you play as White or Black?",
+					(gameOptions[t].equals(onlineOption) ? "Finding Game"
+							: "Creating Game") + " :: Player Setup",
+					JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE,
 					new ImageIcon(ICON), playerOptions, playerOptions[0]);
 			wComp = u == 1;
 			bComp = u == 0;
+			delay = gameOptions[t].equals(onlineOption) ? onlineBotDelay : 0;
 		} else {
 			System.exit(0);
 			return; // To stop the squiggly red line
@@ -179,7 +195,8 @@ public class PawnRace {
 			splitjp2top.add(gapB);
 
 			JPanel splitjp2bottom = new JPanel();
-			splitjp2bottom.setLayout(new BoxLayout(splitjp2bottom, BoxLayout.X_AXIS));
+			splitjp2bottom.setLayout(new BoxLayout(splitjp2bottom,
+					BoxLayout.X_AXIS));
 			splitjp2bottom.add(new JLabel(new ImageIcon(WPAWN)));
 			splitjp2bottom.add(new JLabel(new ImageIcon(WPAWN)));
 			splitjp2bottom.add(new JLabel(new ImageIcon(BPAWN)));
@@ -189,7 +206,8 @@ public class PawnRace {
 			splitjp1.add(splitjp2bottom);
 			splitjp1.add(splitjp2top);
 
-			JOptionPane.showMessageDialog(null, splitjp1, "Board Setup", JOptionPane.PLAIN_MESSAGE);
+			JOptionPane.showMessageDialog(null, splitjp1, "Board Setup",
+					JOptionPane.PLAIN_MESSAGE);
 			sqW = (String) gapW.getSelectedItem();
 			sqB = (String) gapB.getSelectedItem();
 		} else {
@@ -200,7 +218,8 @@ public class PawnRace {
 		setUpBoardGame(sqW.toLowerCase().charAt(0), sqB.toLowerCase().charAt(0));
 		gui.setBoard(board);
 
-		setUpPlayers(wComp, bComp, Heuristic.hs[rand.nextInt(Heuristic.hs.length)],
+		setUpPlayers(wComp, bComp,
+				Heuristic.hs[rand.nextInt(Heuristic.hs.length)],
 				Heuristic.hs[rand.nextInt(Heuristic.hs.length)]);
 
 	}
@@ -261,7 +280,8 @@ public class PawnRace {
 
 			display();
 
-			printInfo("It is " + currentPlayer.getColour().toString() + "'s turn");
+			printInfo("It is " + currentPlayer.getColour().toString()
+					+ "'s turn");
 
 			if (currentPlayer.isComputer()) {
 				long lastTime = 0;
@@ -274,7 +294,8 @@ public class PawnRace {
 				System.out.println();
 				if (delay != 0) {
 					try {
-						TimeUnit.MILLISECONDS.sleep((long) (500 + rand.nextInt(delay)));
+						TimeUnit.MILLISECONDS.sleep((long) (500 + rand
+								.nextInt(delay)));
 
 					} catch (InterruptedException e) {
 						e.printStackTrace();
@@ -289,7 +310,8 @@ public class PawnRace {
 					String input = sc.next();
 
 					if (input.toLowerCase().equals("undo")) {
-						System.out.println("How many times do you want to undo?");
+						System.out
+								.println("How many times do you want to undo?");
 						int undos = Math.abs(sc.nextInt());
 						while (undos > 0) {
 							undos--;
@@ -304,41 +326,56 @@ public class PawnRace {
 						continue;
 					} else if (input.toLowerCase().equals("evaluate")) {
 						System.out.println("W: "
-								+ UtilsAI.evaluateBoard(board, game.getLastMove(), currentPlayer.getColour(),
+								+ UtilsAI.evaluateBoard(board,
+										game.getLastMove(),
+										currentPlayer.getColour(),
 										Colour.WHITE, h1)
-								+ ", B: " + UtilsAI.evaluateBoard(board, game.getLastMove(), currentPlayer.getColour(),
+								+ ", B: "
+								+ UtilsAI.evaluateBoard(board,
+										game.getLastMove(),
+										currentPlayer.getColour(),
 										Colour.BLACK, h2));
 						continue;
 					} else if (input.toLowerCase().equals("evaluatepawn")) {
 						String sq = sc.next();
-						Square evalSquare = UtilsPR.SANtoSquare(sq, board, Colour.NONE);
+						Square evalSquare = UtilsPR.SANtoSquare(sq, board,
+								Colour.NONE);
 
 						if (evalSquare != null) {
-							Colour c = board.getBoardSquare(evalSquare).getOccupier();
+							Colour c = board.getBoardSquare(evalSquare)
+									.getOccupier();
 							if (c != Colour.NONE) {
 								for (Heuristic h : Heuristic.hs)
-									System.out
-											.println(h.getName() + ":: " + sq + ": " + UtilsAI.evaluatePawn(evalSquare,
-													board, game.getLastMove(), currentPlayer.getColour(), c, h, true));
+									System.out.println(h.getName()
+											+ ":: "
+											+ sq
+											+ ": "
+											+ UtilsAI.evaluatePawn(evalSquare,
+													board, game.getLastMove(),
+													currentPlayer.getColour(),
+													c, h, true));
 							}
 						}
 						continue;
 					} else if (input.toLowerCase().equals("validmoves")) {
-						for (MovePR vm : UtilsPR.getAllValidMoves(board, currentPlayer.getColour(),
-								game.getLastMove())) {
+						for (MovePR vm : UtilsPR.getAllValidMoves(board,
+								currentPlayer.getColour(), game.getLastMove())) {
 							System.out.println(vm.getSAN());
 						}
 						continue;
 					} else {
-						m = UtilsPR.SANtoValidMove(input, board, game.getLastMove(), currentPlayer.getColour());
+						m = UtilsPR.SANtoValidMove(input, board,
+								game.getLastMove(), currentPlayer.getColour());
 						if (m == null) {
-							System.out.println("Please enter the SAN for your move");
+							System.out
+									.println("Please enter the SAN for your move");
 						}
 					}
 				}
 				game.applyMove(m);
 			} else {
-				gui.setValidMoves(UtilsPR.getAllValidMoves(board, currentPlayer.getColour(), game.getLastMove()));
+				gui.setValidMoves(UtilsPR.getAllValidMoves(board,
+						currentPlayer.getColour(), game.getLastMove()));
 
 				String promptText = "Your move!";
 				jtfMove.setText(promptText);
@@ -346,7 +383,8 @@ public class PawnRace {
 				MovePR m = null;
 				while (m == null) {
 					String input = jtfMove.getText();
-					m = UtilsPR.SANtoValidMove(input, board, game.getLastMove(), currentPlayer.getColour());
+					m = UtilsPR.SANtoValidMove(input, board,
+							game.getLastMove(), currentPlayer.getColour());
 				}
 				game.applyMove(m);
 			}
@@ -367,14 +405,17 @@ public class PawnRace {
 	private boolean setUpFromArgs(String[] args) {
 		// TODO Make this bulletproof
 		if (args.length == 6 && args[0].equals("C") && args[1].equals("C")) {
-			setUpBoardGame(args[2].toLowerCase().charAt(0), args[3].toLowerCase().charAt(0));
+			setUpBoardGame(args[2].toLowerCase().charAt(0), args[3]
+					.toLowerCase().charAt(0));
 			Heuristic h1st = Heuristic.getHeuristic(args[4].toLowerCase());
 			Heuristic h2nd = Heuristic.getHeuristic(args[5].toLowerCase());
 			setUpPlayers(true, true, h1st, h2nd);
 			return true;
 		} else if (args.length == 5
-				&& ((args[0].equals("P") && args[1].equals("C")) || (args[0].equals("C") && args[1].equals("P")))) {
-			setUpBoardGame(args[2].toLowerCase().charAt(0), args[3].toLowerCase().charAt(0));
+				&& ((args[0].equals("P") && args[1].equals("C")) || (args[0]
+						.equals("C") && args[1].equals("P")))) {
+			setUpBoardGame(args[2].toLowerCase().charAt(0), args[3]
+					.toLowerCase().charAt(0));
 			Heuristic h = Heuristic.getHeuristic(args[4].toLowerCase());
 			if (args[0].equals("C")) {
 				setUpPlayers(true, false, h, null);
@@ -383,14 +424,17 @@ public class PawnRace {
 				setUpPlayers(false, true, null, h);
 				return true;
 			}
-		} else if (args.length == 4 && (args[0].equals("P") || args[0].equals("C"))
+		} else if (args.length == 4
+				&& (args[0].equals("P") || args[0].equals("C"))
 				&& (args[1].equals("P") || args[1].equals("C"))) {
-			setUpBoardGame(args[2].toLowerCase().charAt(0), args[3].toLowerCase().charAt(0));
+			setUpBoardGame(args[2].toLowerCase().charAt(0), args[3]
+					.toLowerCase().charAt(0));
 			setUpPlayers(args[0].equals("C"), args[1].equals("C"), null, null);
 			return true;
 		} else {
-			System.out.println(
-					"Arguments: <P/C> <P/C> <A..H> <A..H> [AIName] [AIName]: " + "White, Black, GapWhite, GapBlack; "
+			System.out
+					.println("Arguments: <P/C> <P/C> <A..H> <A..H> [AIName] [AIName]: "
+							+ "White, Black, GapWhite, GapBlack; "
 							+ "Last parameters only if AI is to be specified, one per computer player ");
 			return false;
 		}
@@ -401,7 +445,8 @@ public class PawnRace {
 		game = new GamePR(board, Colour.WHITE);
 	}
 
-	public void setUpPlayers(boolean p1isCPU, boolean p2isCPU, Heuristic h1st, Heuristic h2nd) {
+	public void setUpPlayers(boolean p1isCPU, boolean p2isCPU, Heuristic h1st,
+			Heuristic h2nd) {
 		BotPR botBrain1 = null;
 		BotPR botBrain2 = null;
 
